@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dinosaur Jumping Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background-color: #f4f4f4;
+    }
+
+    #gameContainer {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background-color: #87CEEB;
+      border: 2px solid #333;
+      overflow: hidden;
+    }
+
+    #ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 50px;
+      background-color: #654321;
+    }
+
+    #dino {
+      position: absolute;
+      bottom: 50px;
+      left: 50px;
+      width: 50px;
+      height: 50px;
+      background-color: #228B22;
+      border-radius: 5px;
+    }
+
+    #obstacle {
+      position: absolute;
+      bottom: 50px;
+      right: -50px;
+      width: 30px;
+      height: 30px;
+      background-color: #8B0000;
+    }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="gameContainer">
+    <div id="score">Score: 0</div>
+    <div id="dino"></div>
+    <div id="obstacle"></div>
+    <div id="ground"></div>
+  </div>
+  <script>
+    const dino = document.getElementById('dino');
+    const obstacle = document.getElementById('obstacle');
+    const scoreDisplay = document.getElementById('score');
+    let isJumping = false;
+    let isFalling = false;
+    let score = 0;
+    let obstacleSpeed = 10;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        jump();
+      }
+    });
+
+    function jump() {
+      if (isJumping || isFalling) return;
+      isJumping = true;
+      let position = parseInt(window.getComputedStyle(dino).bottom);
+      const jumpHeight = 150;
+
+      const upInterval = setInterval(() => {
+        if (position >= 50 + jumpHeight) {
+          clearInterval(upInterval);
+          fall();
+        } else {
+          position += 5;
+          dino.style.bottom = position + 'px';
+        }
+      }, 20);
+    }
+
+    function fall() {
+      isFalling = true;
+      let position = parseInt(window.getComputedStyle(dino).bottom);
+
+      const downInterval = setInterval(() => {
+        if (position <= 50) {
+          clearInterval(downInterval);
+          isFalling = false;
+          isJumping = false;
+        } else {
+          position -= 5;
+          dino.style.bottom = position + 'px';
+        }
+      }, 20);
+    }
+
+    function moveObstacle() {
+      let obstaclePosition = window.innerWidth;
+
+      const interval = setInterval(() => {
+        if (obstaclePosition < -30) {
+          obstaclePosition = window.innerWidth;
+          score += 10;
+          scoreDisplay.textContent = `Score: ${score}`;
+
+          // Increase speed as score increases
+          if (score % 50 === 0) {
+            obstacleSpeed += 1;
+          }
+        }
+
+        const dinoRect = dino.getBoundingClientRect();
+        const obstacleRect = obstacle.getBoundingClientRect();
+
+        if (
+          dinoRect.right > obstacleRect.left &&
+          dinoRect.left < obstacleRect.right &&
+          dinoRect.bottom > obstacleRect.top
+        ) {
+          clearInterval(interval);
+          alert('Game Over! Your score: ' + score);
+          location.reload();
+        }
+
+        obstaclePosition -= obstacleSpeed;
+        obstacle.style.left = obstaclePosition + 'px';
+      }, 20);
+    }
+
+    moveObstacle();
+  </script>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ms-auto py-4 py-lg-0">
+         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../index.html">Home</a></li>
+      <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="iawebapp.html">Dino Game</a></li>
+         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="scatch.html">Scratch page</a></li>
+        </ul>
+    </div>
+</body>
+</html>
+
+
